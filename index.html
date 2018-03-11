@@ -1,0 +1,78 @@
+<!DOCTYPE html>
+<html lang="en">
+
+<head>
+    <script src="https://unpkg.com/vue/dist/vue.js"></script>
+    <script src="https://www.gstatic.com/firebasejs/4.11.0/firebase.js"></script>
+    <script src="https://unpkg.com/vuefire/dist/vuefire.js"></script>
+</head>
+
+<body>
+    <div id="app">
+        <ul is="transition-group">
+            <li v-for="user in users" :key="user['.key']">
+                <span>{{user.name}} - {{user.email}} {{ user['.key']}}</span>
+                <button v-on:click="removeUser(user)">X</button>
+            </li>
+        </ul>
+        <form id="form" v-on:submit.prevent="addUser">
+            <input type="text" v-model="newUser.name" placeholder="Username">
+            <input type="email" v-model="newUser.email" placeholder="email@email.com">
+            <input type="submit" value="Add User">
+        </form>
+    </div>
+
+</body>
+
+<script>
+    // TODO: Move this to its own script
+
+    // Initialize Firebase
+    var config = {
+        // paste your config from your Firebase project here
+        apiKey: "AIzaSyCYBwKv1Sw2QxVB0Q0PIoYRGQBNq8oxoSU",
+        authDomain: "vuefirebaseauth-da0a0.firebaseapp.com",
+        databaseURL: "https://vuefirebaseauth-da0a0.firebaseio.com",
+        projectId: "vuefirebaseauth-da0a0",
+        storageBucket: "vuefirebaseauth-da0a0.appspot.com",
+        messagingSenderId: "64713384191"
+    };
+    firebase.initializeApp(config);
+
+    var usersRef = firebase.database().ref('users')
+
+    // create Vue app
+    var app = new Vue({
+        // element to mount to
+        el: '#app',
+        // initial data
+        data: {
+            newUser: {
+                name: '',
+                email: ''
+            }
+        },
+        // firebase binding        
+        firebase: {
+            users: usersRef
+        },
+        // computed property - can do validation checks here
+        computed: {},
+        // methods
+        methods: {
+            addUser: function () {
+                //TODO: Do validation before adding to DB
+                usersRef.push(this.newUser)
+                this.newUser.name = ''
+                this.newUser.email = ''
+            },
+            removeUser: function (user) {
+                
+                // ['.key] seems to be a unique identifier for the item
+                usersRef.child(user['.key']).remove()
+            }
+        }
+    })
+</script>
+
+</html>
